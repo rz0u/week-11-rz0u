@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
-import { JWT_SIGN } from "../utils/jwt-token";
-import { StandardError } from "../constant/standard-error";
+import { JWT_SIGN } from "../utils/jwt-token.js";
+import { StandardError } from "../constant/standard-error.js";
 
 export const authenticationMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;

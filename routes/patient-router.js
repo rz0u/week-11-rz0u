@@ -11,9 +11,9 @@ import {
 
 export const patientRouter = Router();
 
-patientRouter.get("/", getAllPatients);
+patientRouter.get("/", authorizationMiddleware, getAllPatients);
 patientRouter.post("/", createPatient);
-patientRouter.put("/", updatePatient);
+patientRouter.put("/", authorizationMiddleware, updatePatient);
 patientRouter.get("/", getPatientById);
-patientRouter.delete("/", deletePatient);
+patientRouter.delete("/", authorizationMiddleware, deletePatient);
 patientRouter.get("/", searchPatientByName);
