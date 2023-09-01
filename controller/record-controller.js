@@ -15,7 +15,7 @@ export const getAllRecords = async (req, res) => {
 
 // Post new records
 export const createRecord = async (req, res) => {
-  const { patient_id, symptoms, diagnosis, remedy, prescription } = req.body;
+  const { patientId, symptoms, diagnosis, remedy, prescription } = req.body;
   const appointmentDate = new Date();
   try {
     const newRecord = await req.db.collection("records").insertOne({
@@ -37,15 +37,15 @@ export const createRecord = async (req, res) => {
 export const getRecordByPatientId = async (req, res) => {
   const patientId = req.params.patientId;
   try {
-    const records = await req.db
+    const result = await req.db
       .collection("records")
       .find({ patientId })
       .toArray();
-    if (result.matchedCount === 0) {
+    if (!result) {
       res.status(404).json({ message: "Record not found" });
       return;
     }
-    res.status(200).json({ message: "Records with ID", data: records });
+    res.status(200).json({ message: "Records with ID", data: result });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -59,7 +59,7 @@ export const updateRecord = async (req, res) => {
     const result = await req.db
       .collection("patients")
       .updateOne({ _id: recordId }, { $set: updatedData });
-    if (result.modifiedCount === 0) {
+    if (!result) {
       res.status(404).json({ message: "Record not found" });
       return;
     }
@@ -75,11 +75,8 @@ export const deleteRecord = async (req, res) => {
   try {
     const result = await req.db
       .collection("records")
-      .updateOne(
-        { _id: new ObjectId(recordId) },
-        { $set: { deletedAt: new Date(), updatedAt: new Date() } }
-      );
-    if (result.modifiedCount === 0) {
+      .deleteOne({ _id: new ObjectId(recordId) });
+    if (!result) {
       res.status(404).json({ message: "Record not found" });
     }
     res.status(200).json({ message: "Record info deleted" });
@@ -94,7 +91,7 @@ export const getRecordByTime = async (req, res) => {
   const month = parseInt(req.query.month);
 
   try {
-    const records = await req.db
+    const results = await req.db
       .collection("records")
       .find({
         $expr: {
@@ -105,11 +102,11 @@ export const getRecordByTime = async (req, res) => {
         },
       })
       .toArray();
-    if (result.matchedCount === 0) {
+    if (!results) {
       res.status(404).json({ message: "Records not found" });
       return;
     }
-    res.status(200).json({ message: "Records found", data: records });
+    res.status(200).json({ message: "Records found", data: results });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

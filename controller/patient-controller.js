@@ -53,8 +53,8 @@ export const updatePatient = async (req, res) => {
   try {
     const result = await req.db
       .collection("patients")
-      .updateOne({ _id: patientId }, { $set: updatedData });
-    if (result.modifiedCount === 0) {
+      .updateOne({ _id: new ObjectId(patientId) }, { $set: updatedData });
+    if (!result) {
       res.status(404).json({ message: "Patient not found" });
       return;
     }
@@ -72,7 +72,7 @@ export const getPatientById = async (req, res) => {
       .collection("patients")
       .findOne({ _id: new ObjectId(patientId) });
     console.log(result);
-    if (result.matchedCount === 0) {
+    if (!result) {
       res.status(404).json({ message: "Patient not found" });
       return;
     }
@@ -90,11 +90,8 @@ export const deletePatient = async (req, res) => {
   try {
     const result = await req.db
       .collection("patients")
-      .updateOne(
-        { _id: new ObjectId(patientId) },
-        { $set: { deletedAt: new Date(), updatedAt: new Date() } }
-      );
-    if (result.modifiedCount === 0) {
+      .deleteOne({ _id: new ObjectId(patientId) });
+    if (!result) {
       res.status(404).json({ message: "Patient not found" });
     }
     res.status(200).json({ message: "Patient info deleted" });
@@ -105,20 +102,20 @@ export const deletePatient = async (req, res) => {
 
 // Search patients by name (?)
 export const searchPatientByName = async (req, res) => {
-  const searchName = req.query.name;
-  const searchPattern = new RegExp(searchName, "i");
+  const name = req.query.name;
+  const searchPattern = new RegExp(name, "i");
   try {
     const patients = await req.db
       .collection("patients")
       .find({ name: { $regex: searchPattern } })
       .toArray();
-    if (searchName.matchedCount === 0) {
+    if (!name) {
       res.status(404).json({ message: "Patient not found" });
       return;
     }
     res
       .status(200)
-      .json({ message: `Patients with name: ${searchName}`, data: patients });
+      .json({ message: `Patients with name: ${name}`, data: patients });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
