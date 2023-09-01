@@ -13,7 +13,7 @@ export const recordRouter = Router();
 
 recordRouter.get("/", getAllRecords);
 recordRouter.post("/", createRecord);
-recordRouter.get("/:id", authorizationMiddleware, getRecordByPatientId);
-recordRouter.put("/:id", authorizationMiddleware, updateRecord);
+recordRouter.get("/:patientId", authorizationMiddleware, getRecordByPatientId);
+recordRouter.patch("/:id", authorizationMiddleware, updateRecord);
 recordRouter.delete("/:id", authorizationMiddleware, deleteRecord);
-recordRouter.get("/search?year={year}&month={month}", getRecordByTime);
+recordRouter.put("/", getRecordByTime);

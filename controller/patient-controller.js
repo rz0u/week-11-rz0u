@@ -46,7 +46,7 @@ export const createPatient = async (req, res) => {
   }
 };
 
-// Update patients info (-----------------------STILL NEED FIXING---------------------------)
+// Update patients info
 export const updatePatient = async (req, res) => {
   const patientId = req.params.id;
   const updatedData = req.body;
@@ -103,20 +103,23 @@ export const deletePatient = async (req, res) => {
 // Search patients by name (?)
 export const searchPatientByName = async (req, res) => {
   const name = req.query.name;
+  console.log(name);
   const searchPattern = new RegExp(name, "i");
   try {
     const patients = await req.db
       .collection("patients")
-      .find({ name: { $regex: searchPattern } })
+      .find({ name: searchPattern })
       .toArray();
-    if (!name) {
-      res.status(404).json({ message: "Patient not found" });
+    console.log(patients);
+    if (patients.length === 0) {
+      res.status(404).json({ message: "data empty" });
       return;
     }
     res
       .status(200)
       .json({ message: `Patients with name: ${name}`, data: patients });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };

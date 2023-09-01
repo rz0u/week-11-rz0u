@@ -7,6 +7,9 @@ import { userRouter } from "./routes/user-router.js";
 import { patientRouter } from "./routes/patient-router.js";
 import { recordRouter } from "./routes/record-router.js";
 import { authenticationMiddleware } from "./middleware/auth-middleware.js";
+import fs from "fs";
+import yaml from "yaml";
+import swaggerUi from "swagger-ui-express";
 
 const app = express();
 const port = process.env.PORT || 3000;

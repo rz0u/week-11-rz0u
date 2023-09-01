@@ -16,4 +16,4 @@ patientRouter.post("/", createPatient);
 patientRouter.patch("/:id", authorizationMiddleware, updatePatient);
 patientRouter.get("/:id", getPatientById);
 patientRouter.delete("/:id", authorizationMiddleware, deletePatient);
-patientRouter.get("/", searchPatientByName);
+patientRouter.put("/", searchPatientByName);

@@ -41,11 +41,12 @@ export const getRecordByPatientId = async (req, res) => {
       .collection("records")
       .find({ patientId })
       .toArray();
-    if (!result) {
+    console.log(result);
+    if (result.length === 0) {
       res.status(404).json({ message: "Record not found" });
       return;
     }
-    res.status(200).json({ message: "Records with ID", data: result });
+    res.status(200).json({ message: "Records with PatientId", data: result });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -57,9 +58,10 @@ export const updateRecord = async (req, res) => {
   const updatedData = req.body;
   try {
     const result = await req.db
-      .collection("patients")
-      .updateOne({ _id: recordId }, { $set: updatedData });
-    if (!result) {
+      .collection("records")
+      .updateOne({ _id: new ObjectId(recordId) }, { $set: updatedData });
+    console.log(result);
+    if (result.matchedCount === 0) {
       res.status(404).json({ message: "Record not found" });
       return;
     }
