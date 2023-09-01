@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:1369
     description: Development server
-  - url: https://ClinicABC.fly.dev/
+  - url: https://abclinic.fly.dev/
     description: Deployed server
 components:
   securitySchemes:
