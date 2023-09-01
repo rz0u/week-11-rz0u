@@ -5,7 +5,7 @@ import { StandardError } from "../constant/standard-error.js";
 
 // Register User
 const registerService = async (req, username, role, password) => {
-  const user = await db.collection("users").findOne({ username });
+  const user = await req.db.collection("users").findOne({ username });
   if (user) {
     throw new StandardError({ message: "Username is taken", status: 400 });
   }
@@ -42,7 +42,7 @@ export const registerUser = async (req, res, next) => {
 export const loginUser = async (req, res) => {
   const { username, password } = req.body;
 
-  const user = await db.collection("users").findOne({ username });
+  const user = await req.db.collection("users").findOne({ username });
   if (!user) {
     throw new StandardError({ message: "Username not found", status: 404 });
   }

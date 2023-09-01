@@ -65,12 +65,13 @@ export const updatePatient = async (req, res) => {
 };
 
 // Get patient with id
-export const getPatientById = (req, res) => {
+export const getPatientById = async (req, res) => {
   const patientId = req.params.id;
   try {
-    const result = req.db
+    const result = await req.db
       .collection("patients")
       .findOne({ _id: new ObjectId(patientId) });
+    console.log(result);
     if (result.matchedCount === 0) {
       res.status(404).json({ message: "Patient not found" });
       return;
