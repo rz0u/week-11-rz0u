@@ -5,7 +5,6 @@ import {
   getRecordByPatientId,
   updateRecord,
   deleteRecord,
-  getRecordByTime,
 } from "../controller/record-controller.js";
 import { authorizationMiddleware } from "../middleware/auth-middleware.js";
 
@@ -16,4 +15,3 @@ recordRouter.post("/", createRecord);
 recordRouter.get("/:patientId", authorizationMiddleware, getRecordByPatientId);
 recordRouter.patch("/:id", authorizationMiddleware, updateRecord);
 recordRouter.delete("/:id", authorizationMiddleware, deleteRecord);
-recordRouter.put("/", getRecordByTime);

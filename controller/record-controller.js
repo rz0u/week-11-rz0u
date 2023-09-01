@@ -2,15 +2,40 @@ import { ObjectId } from "mongodb";
 
 // Get all records
 export const getAllRecords = async (req, res) => {
-  try {
-    const records = await req.db.collection("records").find().toArray();
-    res.status(200).json({
-      message: "All records retrieved",
-      data: records,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  if (req.query) {
+    const year = parseInt(req.query.year);
+    const month = parseInt(req.query.month);
+
+    try {
+      const results = await req.db
+        .collection("records")
+        .find({
+          $expr: {
+            $and: [
+              { $eq: [{ $year: "$appointmentDate" }, year] },
+              { $eq: [{ $month: "$appointmentDate" }, month] },
+            ],
+          },
+        })
+        .toArray();
+      if (!results) {
+        res.status(404).json({ message: "Records not found" });
+        return;
+      }
+      res.status(200).json({ message: "Records found", data: results });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  } else
+    try {
+      const records = await req.db.collection("records").find().toArray();
+      res.status(200).json({
+        message: "All records retrieved",
+        data: records,
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
 };
 
 // Post new records
@@ -87,29 +112,29 @@ export const deleteRecord = async (req, res) => {
   }
 };
 
-// Get records with month and year
-export const getRecordByTime = async (req, res) => {
-  const year = parseInt(req.query.year);
-  const month = parseInt(req.query.month);
+// // Get records with month and year
+// export const getRecordByTime = async (req, res) => {
+//   const year = parseInt(req.query.year);
+//   const month = parseInt(req.query.month);
 
-  try {
-    const results = await req.db
-      .collection("records")
-      .find({
-        $expr: {
-          $and: [
-            { $eq: [{ $year: "$appointmentDate" }, year] },
-            { $eq: [{ $month: "$appointmentDate" }, month] },
-          ],
-        },
-      })
-      .toArray();
-    if (!results) {
-      res.status(404).json({ message: "Records not found" });
-      return;
-    }
-    res.status(200).json({ message: "Records found", data: results });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+//   try {
+//     const results = await req.db
+//       .collection("records")
+//       .find({
+//         $expr: {
+//           $and: [
+//             { $eq: [{ $year: "$appointmentDate" }, year] },
+//             { $eq: [{ $month: "$appointmentDate" }, month] },
+//           ],
+//         },
+//       })
+//       .toArray();
+//     if (!results) {
+//       res.status(404).json({ message: "Records not found" });
+//       return;
+//     }
+//     res.status(200).json({ message: "Records found", data: results });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };

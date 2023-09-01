@@ -2,16 +2,47 @@ import { ObjectId } from "mongodb";
 
 // Get all patients
 export const getAllPatients = async (req, res) => {
-  try {
-    const patients = await req.db.collection("patients").find().toArray();
-    res.status(200).json({
-      message: "All patients retrieved",
-      data: patients,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  if (req.query.name) {
+    const name = req.query.name;
+    console.log(name);
+    const searchPattern = new RegExp(name, "i");
+    try {
+      const patients = await req.db
+        .collection("patients")
+        .find({ name: searchPattern })
+        .toArray();
+      console.log(patients);
+      if (patients.length === 0) {
+        res.status(404).json({ message: "data empty" });
+        return;
+      }
+      res
+        .status(200)
+        .json({ message: `Patients with name: ${name}`, data: patients });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error.message });
+    }
+  } else
+    try {
+      const patients = await req.db.collection("patients").find().toArray();
+      res.status(200).json({
+        message: "All patients retrieved",
+        data: patients,
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
 };
+// try {
+//   const patients = await req.db.collection("patients").find().toArray();
+//   res.status(200).json({
+//     message: "All patients retrieved",
+//     data: patients,
+//   });
+// } catch (error) {
+//   res.status(500).json({ error: error.message });
+// }
 
 // Post new patients
 export const createPatient = async (req, res) => {
@@ -100,26 +131,26 @@ export const deletePatient = async (req, res) => {
   }
 };
 
-// Search patients by name (?)
-export const searchPatientByName = async (req, res) => {
-  const name = req.query.name;
-  console.log(name);
-  const searchPattern = new RegExp(name, "i");
-  try {
-    const patients = await req.db
-      .collection("patients")
-      .find({ name: searchPattern })
-      .toArray();
-    console.log(patients);
-    if (patients.length === 0) {
-      res.status(404).json({ message: "data empty" });
-      return;
-    }
-    res
-      .status(200)
-      .json({ message: `Patients with name: ${name}`, data: patients });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: error.message });
-  }
-};
+// // Search patients by name (?)
+// export const searchPatientByName = async (req, res) => {
+//   const name = req.query.name;
+//   console.log(name);
+//   const searchPattern = new RegExp(name, "i");
+//   try {
+//     const patients = await req.db
+//       .collection("patients")
+//       .find({ name: searchPattern })
+//       .toArray();
+//     console.log(patients);
+//     if (patients.length === 0) {
+//       res.status(404).json({ message: "data empty" });
+//       return;
+//     }
+//     res
+//       .status(200)
+//       .json({ message: `Patients with name: ${name}`, data: patients });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ error: error.message });
+//   }
+// };
