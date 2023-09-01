@@ -13,7 +13,7 @@ export const getAllPatients = async (req, res) => {
         .toArray();
       console.log(patients);
       if (patients.length === 0) {
-        res.status(404).json({ message: "data empty" });
+        res.status(404).json({ message: "Patients not found" });
         return;
       }
       res
@@ -34,15 +34,6 @@ export const getAllPatients = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
 };
-// try {
-//   const patients = await req.db.collection("patients").find().toArray();
-//   res.status(200).json({
-//     message: "All patients retrieved",
-//     data: patients,
-//   });
-// } catch (error) {
-//   res.status(500).json({ error: error.message });
-// }
 
 // Post new patients
 export const createPatient = async (req, res) => {

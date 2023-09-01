@@ -1,0 +1,653 @@
+openapi: 3.0.0
+info:
+  title: Milestone 2
+  version: 1.0.0
+  description: Clinic Database to migrate from paperbased to digitalized
+servers:
+  - url: http://localhost:1369
+    description: Development server
+  - url: https://ClinicABC.fly.dev/
+    description: Deployed server
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Bearer with JWT token"
+  schemas:
+    UserRegister:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 5
+        password:
+          type: string
+          minLength: 8
+          pattern: "^(?=.*[a-zA-Z])(?=.*[0-9]).*$"
+        role:
+          type: string
+          enum:
+            - "doctor"
+            - "staff"
+      required:
+        - "username"
+        - "role"
+        - "password"
+    UserLogin:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    BadRequest:
+      type: object
+      properties:
+        message:
+          type: string
+    ServerError:
+      type: object
+      properties:
+        error:
+          type: string
+    RegisterPatient:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "John Doe"
+        address:
+          type: string
+          example: "18th Avenue"
+        dob:
+          type: string
+          format: date
+          example: "YYYY-MM-DD"
+        sex:
+          type: string
+          enum:
+            - "male"
+            - "female"
+          example: "male"
+        marriageStatus:
+          type: string
+          example: "single"
+        emergencyContact:
+          type: string
+          example: "+21 8865556"
+        medicalRecords:
+          type: string
+          example: "anemia"
+      required:
+        - "name"
+        - "address"
+        - "dob"
+        - "sex"
+    UpdatePatient:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+        dob:
+          type: string
+          format: date
+        sex:
+          type: string
+          enum:
+            - "male"
+            - "female"
+        marriageStatus:
+          type: string
+        emergencyContact:
+          type: string
+        medicalRecords:
+          type: string
+    RegisterRecord:
+      type: object
+      properties:
+        patientId:
+          type: string
+          example: "654asdf5sa4df65sa4d"
+        symptoms:
+          type: string
+          example: "light-headed"
+        diagnosis:
+          type: string
+          example: "fatigue"
+        remedy:
+          type: string
+          example: "plenty of rest"
+        prescription:
+          type: string
+          example: "vitamins"
+      required:
+        - "patientId"
+        - "symptoms"
+        - "diagnosis"
+        - "remedy"
+    UpdateRecord:
+      type: object
+      properties:
+        patientId:
+          type: string
+        symptoms:
+          type: string
+        diagnosis:
+          type: string
+        remedy:
+          type: string
+        prescription:
+          type: string
+
+paths:
+  /users/register:
+    post:
+      summary: New user registration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegister"
+      responses:
+        "201":
+          description: New user successfully registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      acknowledged:
+                        type: string
+                      insertedId:
+                        type: integer
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        "500":
+          description: "Server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  /users/login:
+    post:
+      summary: User login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLogin"
+      responses:
+        "200":
+          description: "Successfully logged in"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: string
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        "500":
+          description: "Server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  /patients:
+    get:
+      security:
+        - bearer: []
+      summary: Get all Patients
+      responses:
+        "200":
+          description: "All patients retrieved"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        address:
+                          type: string
+                        dob:
+                          type: string
+                          format: date
+                        sex:
+                          type: string
+                          enum:
+                            - "male"
+                            - "female"
+                        marriageStatus:
+                          type: string
+                        emergencyContact:
+                          type: string
+                        medicalRecords:
+                          type: string
+        "500":
+          description: "Server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+    post:
+      security:
+        - bearer: []
+      summary: Create new patient info
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterPatient"
+      responses:
+        "201":
+          description: Patient info added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      acknowledged::
+                        type: string
+                      insertedId::
+                        type: string
+        "500":
+          description: "Server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  /patients/?name={name}:
+    get:
+      security:
+        - bearer: []
+      summary: Get Patients with searched name
+      responses:
+        "200":
+          description: "Patients with name: {name}"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        address:
+                          type: string
+                        dob:
+                          type: string
+                          format: date
+                        sex:
+                          type: string
+                          enum:
+                            - "male"
+                            - "female"
+                        marriageStatus:
+                          type: string
+                        emergencyContact:
+                          type: string
+                        medicalRecords:
+                          type: string
+        "404":
+          description: Patients not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: "Server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  /patients/{id}:
+    get:
+      security:
+        - bearer: []
+      summary: Get patient with id
+      responses:
+        "200":
+          description: Retrieved patient with requested id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: Patients not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: "Server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+    patch:
+      security:
+        - bearer: []
+      summary: Update patient with id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePatient"
+      responses:
+        "200":
+          description: Patient info updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatePatient"
+        "404":
+          description: Patients not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: "Server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+    delete:
+      security:
+        - bearer: []
+      summary: Delete patient with id
+      responses:
+        "200":
+          description: Patient info deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: Patients not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: "Server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  /records:
+    get:
+      security:
+        - bearer: []
+      summary: Get all Records
+      responses:
+        "200":
+          description: "All records retrieved"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        patientId:
+                          type: string
+                        symptoms:
+                          type: string
+                        diagnosis:
+                          type: string
+                        remedy:
+                          type: string
+                        prescription:
+                          type: string
+        "500":
+          description: "Server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+    post:
+      security:
+        - bearer: []
+      summary: Create new record info
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRecord"
+      responses:
+        "201":
+          description: Record info added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      acknowledged::
+                        type: string
+                      insertedId::
+                        type: string
+        "500":
+          description: "Server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  /records/?year={year}&month={month}:
+    get:
+      security:
+        - bearer: []
+      summary: Get Records with searched year and month
+      responses:
+        "200":
+          description: Records found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        patientId:
+                          type: string
+                        symptoms:
+                          type: string
+                        diagnosis:
+                          type: string
+                        remedy:
+                          type: string
+                        prescription:
+                          type: string
+        "404":
+          description: Records not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: "Server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  /records/{id}:
+    patch:
+      security:
+        - bearer: []
+      summary: Update patient with id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRecord"
+      responses:
+        "200":
+          description: Record info updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateRecord"
+        "404":
+          description: Patients not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: "Server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+    delete:
+      security:
+        - bearer: []
+      summary: Delete patient with id
+      responses:
+        "200":
+          description: Patient info deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: Patients not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: "Server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  /records/{PatientId}:
+    get:
+      security:
+        - bearer: []
+      summary: Get records with patientId
+      responses:
+        "200":
+          description: "All records retrieved"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        patientId:
+                          type: string
+                        symptoms:
+                          type: string
+                        diagnosis:
+                          type: string
+                        remedy:
+                          type: string
+                        prescription:
+                          type: string
+        "404":
+          description: Patients not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: "Server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"

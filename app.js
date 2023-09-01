@@ -2,7 +2,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
-import { OpenApiValidator } from "express-openapi-validator/dist/openapi.validator.js";
+import OpenApiValidator from "express-openapi-validator";
 import { databaseMiddleware } from "./middleware/database-middleware.js";
 import { userRouter } from "./routes/user-router.js";
 import { patientRouter } from "./routes/patient-router.js";
@@ -22,12 +22,12 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 
 // OpenAPI Validator
-// app.use(
-//   OpenApiValidator.middleware({
-//     apiSpec: "./doc/openapi.yaml",
-//     validateRequests: true,
-//   })
-// );
+app.use(
+  OpenApiValidator.middleware({
+    apiSpec: "./doc/openapi.yaml",
+    validateRequests: true,
+  })
+);
 
 // Swagger UI Setup
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
