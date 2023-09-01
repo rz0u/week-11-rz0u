@@ -87,7 +87,7 @@ export const getPatientById = (req, res) => {
 export const deletePatient = async (req, res) => {
   const patientId = req.params.id;
   try {
-    const result = await db
+    const result = await req.db
       .collection("patients")
       .updateOne(
         { _id: new ObjectId(patientId) },
@@ -105,10 +105,11 @@ export const deletePatient = async (req, res) => {
 // Search patients by name (?)
 export const searchPatientByName = async (req, res) => {
   const searchName = req.query.name;
+  const searchPattern = new RegExp(searchName, "i");
   try {
-    const patients = await db
+    const patients = await req.db
       .collection("patients")
-      .find({ name: searchName })
+      .find({ name: { $regex: searchPattern } })
       .toArray();
     if (searchName.matchedCount === 0) {
       res.status(404).json({ message: "Patient not found" });

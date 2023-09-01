@@ -13,7 +13,7 @@ export const patientRouter = Router();
 
 patientRouter.get("/", authorizationMiddleware, getAllPatients);
 patientRouter.post("/", createPatient);
-patientRouter.put("/", authorizationMiddleware, updatePatient);
-patientRouter.get("/", getPatientById);
-patientRouter.delete("/", authorizationMiddleware, deletePatient);
-patientRouter.get("/", searchPatientByName);
+patientRouter.put("/:id", authorizationMiddleware, updatePatient);
+patientRouter.get("/:id", getPatientById);
+patientRouter.delete("/:id", authorizationMiddleware, deletePatient);
+patientRouter.get("search?searchName=:{name}", searchPatientByName);
