@@ -1,6 +1,6 @@
 # Clinic API Documentation
 
-## [abclinic.fly.dev](https://abclinic.fly.dev/)
+## [abclinic.fly.dev](https://abclinic.fly.dev/) || [Postman Documentation](https://documenter.getpostman.com/view/29347896/2sA2r6Xjbu)
 
 This API is designed to manage patient and medical records, providing a digital solution for healthcare professionals. Below, you will find short details about the available endpoints and their functionality.
 
